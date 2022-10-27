@@ -7,6 +7,8 @@ import sys
 try:
     import json
     import requests
+    import posixpath
+    from urllib.parse import urljoin
     from requests.auth import HTTPBasicAuth
     from cmk.notification_plugins import utils
     from enum import (
@@ -157,6 +159,12 @@ def writeTrace(string):
     if logLevel % LogLevel.Trace == 0:
         print("TRACE: " + string)
 
+def remove_leading_character(string, character):
+    if (string[0] == character):
+        return string[1:]
+    else: 
+        return(string)
+    
 def send_inote_message(inote_api_url, inote_api_user, inote_api_pass, ignore_cert, inote_message):
     writeVerbose("Creating new IDERI note message...")
 
@@ -258,10 +266,14 @@ def add_link_to_inote_message(context, inotemessage):
         if inotemessage['SHOWFULLSCREEN'] == False and inotemessage['SHOWFULLSCREENANDLOCK'] == False:
             if context['WHAT'] == 'HOST':
                 writeDebug('Composing host url...')
-                linkTarget = context['PARAMETER_CHECKMKURL'] + "/" + context['OMD_SITE'] + "/" + context['HOSTURL']
+                urlPath = posixpath.join(context['OMD_SITE'], remove_leading_character(context['HOSTURL'],"/"))
+                writeTrace("URL part: " + urlPath)
+                linkTarget = urljoin(context['PARAMETER_CHECKMKURL'], urlPath)
             elif context['WHAT'] == 'SERVICE':
                 writeDebug('Composing service url...')
-                linkTarget = context['PARAMETER_CHECKMKURL'] + "/" + context['OMD_SITE'] + "/" + context['SERVICEURL']
+                urlPath = posixpath.join(context['OMD_SITE'], remove_leading_character(context['SERVICEURL'],"/"))
+                writeTrace("URL part: " + urlPath)
+                linkTarget = urljoin(context['PARAMETER_CHECKMKURL'], urlPath)
             if linkTarget != "":
                 writeVerbose("Adding link to IDERI note message...")
                 inotemessage['LINKTARGET'] = str(linkTarget)
