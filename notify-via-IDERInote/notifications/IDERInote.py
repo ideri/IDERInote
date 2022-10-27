@@ -3,6 +3,16 @@
 # IDERI note
 # Bulk: no
 
+## notify-via-IDERInote (notification script)
+## Checkmk notification plugin script for IDERI note.
+##
+## Author: IDERI GmbH (Sebastian Mann)
+## Homepage: https://www.ideri.com
+## Repo URL: https://github.com/ideri/IDERInote-checkMk_plugins
+##
+## History:
+## (2022-10-27) 0.8: initial release
+
 import sys
 try:
     import json

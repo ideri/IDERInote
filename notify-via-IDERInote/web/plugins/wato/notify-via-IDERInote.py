@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 
+## notify-via-IDERInote (WATO UI)
+## This is the Checkmk WATO UI file describing the UI in Checkmk for IDERInote.py notification script.
+## 
+## Author: IDERI GmbH (Sebastian Mann)
+## Homepage: https://www.ideri.com
+## Repo URL: https://github.com/ideri/IDERInote-checkMk_plugins
+## 
+## History:
+## (2022-10-27) 0.8: initial release
+
 from cmk.gui.i18n import _
 
 from cmk.gui.valuespec import (
