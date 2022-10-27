@@ -137,8 +137,10 @@ def get_inote_message_text(context):
     else:
         tmpl_text = tmpl_service_text
 
+    messageText = utils.substitute_context(tmpl_text, context)
+
     writeDebug("Composing message text done.")
-    return utils.substitute_context(tmpl_text, context)
+    return messageText.replace("\n","\r\n")
 
 def writeVerbose(string):
     global logLevel
