@@ -12,6 +12,7 @@
 ##
 ## History:
 ## (2022-10-27) 0.8: initial release
+##              Tested with checkmk 2.0.0p25 + 2.1.0p14
 
 import sys
 try:
