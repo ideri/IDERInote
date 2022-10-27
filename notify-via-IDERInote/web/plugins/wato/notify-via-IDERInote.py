@@ -236,8 +236,8 @@ register_notification_parameters(
             (
                 "inote_plugin_loglevel",
                 CascadingDropdown(
-                    title=_("Log mode:"),
-                    help=_("Setting this to a value other than 'StandPard' the "
+                    title=_("Log level:"),
+                    help=_("Setting this to a value other than 'Standard' the "
                            "script will write more information to the notify.log "
                            "of checkmk. Note: Levels 'Debug' and 'Trace' will "
                            "write extensive amount of data to the notify log."),
