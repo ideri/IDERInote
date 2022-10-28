@@ -18,7 +18,7 @@ If the above prerequesites are fulfilled it is most likely that all of the follo
 - SSH on to your Checkmk server and switch to the site (e.g. ```su - cmk```)
 - Download the latest .mkp package.
     ```shell
-    wget https://github.com/ideri/IDERInote-checkMk_plugins/raw/main/Checkmk_plugins/notify-via-IDERInote/notify-via-IDERInote-0.8.mkp
+    wget https://github.com/ideri/IDERInote/raw/main/Checkmk_plugins/notify-via-IDERInote/notify-via-IDERInote-0.8.mkp
     ```
 - To install the package execute
     ```shell
