@@ -1,8 +1,6 @@
 # notify-via-IDERInote PRTG notification script
 
 ## Table of contents
-- [notify-via-IDERInote PRTG notification script](#notify-via-iderinote-prtg-notification-script)
-  - [Table of contents](#table-of-contents)
   - [Description](#description)
   - [How it works](#how-it-works)
   - [Prerequesites](#prerequesites)
