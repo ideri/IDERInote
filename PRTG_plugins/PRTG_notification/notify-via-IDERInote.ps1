@@ -267,7 +267,7 @@ function New-InoteMessageWithDbForPrtg {
             $msgID = $sensorIDs["$sensorID"]
         }
 
-        # If msgID is other then 0 we update the message. Else we create a new one
+        # If msgID is other then null we update the message. Else we create a new one
         if ($msgID) {
             # Update an existing message
             $msgCreated = Set-iNoteMessage -MessageObject $MessageObj -Index $msgID -Force -ErrorAction Stop
@@ -292,7 +292,7 @@ function New-InoteMessageWithDbForPrtg {
 
             $sensorIDs.Add("$sensorID", $msgID)
 
-            # Finally we export the hash to db.csv, as we added a value
+            # Finally we export the hash to db.csv, as we've added a value
             Export-HashtoCSV -Path "$dbPath" -Hashtable $sensorIDs
         } 
     }
