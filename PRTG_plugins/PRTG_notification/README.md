@@ -18,11 +18,10 @@ By default the file holding the assignments between PRTG sensor IDs and IDERI no
 ## Installation
 - Install the IDERI note PowerShell Module from the latest inote.exe. (You can download it from the IDERI note homepage.)
 - Download the notification script "notify-via-IDERInote.ps1" from the repository. (https://github.com/ideri/IDERInote/blob/PRTG_plugins/PRTG_plugins/PRTG_notification/notify-via-IDERInote.ps1)
-- Copy the script to your PRTG installation notification directory. <br/> (Default: __*"C:\Program Files (x86)\PRTG Network Monitor\notifications\exe\notify-via-IDERInote.ps1"*__)
+- Copy the script to your PRTG installations notification directory. <br/> (Default: __*"C:\Program Files (x86)\PRTG Network Monitor\notifications\exe\notify-via-IDERInote.ps1"*__)
 - Done. Now you can continue with configuring the script in PRTG.
 
 ## How to setup
-As IDERI note uses domain objects (users, computers and security groups) as recipient identifiers we currently cannot use the Checkmk users as recipients. But as Checkmk only sends notifications if a contact is specified in the rule, we first have to create a new dummy user in Checkmk. If we'd check the *Notify all users* box of the rule multiple identical IDERI note messages would be created for each Checkmk user.
 
 ### Step by step
 - Login to PRTG as an administrator.
