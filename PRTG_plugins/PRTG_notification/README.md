@@ -8,7 +8,7 @@ It can, e.g., be used to automatically inform your IT administrators about state
 If a sensor is configured to create a notification with the script, the script itself will check if an IDERI note message has already been created for this particular sensor in the past. If not, the script will attempt to create a new message on the IDERI note server specified, but will also log the sensor ID and the index of the newly created IDERI note message to a file. If the sensor then will change states, the script will check again if a message for that sensor has been created earlier and will attempt to update the message on the server instead of creating a new one each time a notification for that sensor should be sent.
 This way the recipients will only get messages with the latest state of the sensor instead of multiple, maybe even obsolete messages.
 
-By default the file holding the assignments between PRTG sensor IDs and IDERI note message indexes is located in <br />__%PROGRAMDATA%\\IDERI\\note-PRTG-notification\\sensorIdToMessageID.db.csv*__ on the PRTG server.
+By default the file holding the assignments between PRTG sensor IDs and IDERI note message indexes is located in <br />__%PROGRAMDATA%\\IDERI\\note-PRTG-notification\\sensorIdToMessageID.db.csv__ on the PRTG server.
 
 ## Prerequesites
 - PRTG version: >=20.1.57
