@@ -2,7 +2,7 @@ param(
     # The IDERI note server name.
     [Parameter(Mandatory = $true)]
     $InoteServerName,
-    # The TCP port for the IDERI note administrator interface. (Default: 1024)
+    # The TCP port for the IDERI note administrator interface. If none is defined, named pipes will be used.
     [Parameter(Mandatory = $false)]
     $InoteServerPort,
     # The duration in minutes the IDERI note message should be valid for. (Default: 60)
