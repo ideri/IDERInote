@@ -64,7 +64,7 @@ param(
 ##
 ## Author: IDERI GmbH (Sebastian Mann)
 ## Homepage: https://www.ideri.com
-## Repo URL: https://github.com/ideri/IDERInote-checkMk_plugins
+## Repo URL: https://github.com/ideri/IDERInote
 ##
 ## Note: This script includes some functions written by Jeffery Hicks. 
 ##       Thank you for that.
@@ -381,6 +381,7 @@ catch {
     exit 1
 }
 
+# set the addressing mode for the message
 try {
     $message.AddressingMode = [Ideri.Note.AddressingMode]$InoteMsgAddressingMode
 }
