@@ -1,9 +1,22 @@
 # notify-via-IDERInote PRTG notification script
 
+## Table of contents
+- [notify-via-IDERInote PRTG notification script](#notify-via-iderinote-prtg-notification-script)
+  - [Table of contents](#table-of-contents)
+  - [Description](#description)
+  - [How it works](#how-it-works)
+  - [Prerequesites](#prerequesites)
+  - [Installation](#installation)
+  - [How to setup](#how-to-setup)
+    - [Step by step](#step-by-step)
+  - [Parameters available](#parameters-available)
+  - [Troubleshooting](#troubleshooting)
+
 ## Description
 This PRTG notification script can be used to create IDERI note messages out of PRTG using the script provided and 
     the IDERI note PowerShell module. It can, e.g., be used to automatically inform your IT administrators about 
     state changes of PRTG sensors directly on their desktops.
+    ![PRTG_inote_message_down](docs/images/prtg_inote_message_down.png)
 
 ## How it works
 If a sensor is configured to create a notification with the script, the script itself will check if an IDERI note message 
@@ -69,7 +82,6 @@ By default the file holding the assignments between PRTG sensor IDs and IDERI no
     ![PRTG_new_notification_template_exe](docs/images/prtg_notify_template_exe.png)
   
 - After you've configured the template to your needs click the *Create* button on the right hand side of the window.
-
 
 ## Parameters available
 
