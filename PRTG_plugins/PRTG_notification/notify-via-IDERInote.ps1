@@ -28,6 +28,7 @@ param(
     $InoteMsgNotifyAcknowledge = $false,
     # IDERI note message addressing mode. (Default: 'UserAndComputer'; Possible values: 'UserOnly', 'UserAndComputer', 'ComputerOnly')
     [Parameter(Mandatory = $false)]
+    [ValidateSet("UserOnly", "UserAndComputer", "ComputerOnly")]
     $InoteMsgAddressingMode = "UserAndComputer",
 
     # '%sensorid' placeholder data of PRTG
