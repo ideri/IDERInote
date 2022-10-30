@@ -4,7 +4,7 @@ param(
     $InoteServerName,
     # The TCP port for the IDERI note administrator interface. If none is defined, named pipes will be used.
     [Parameter(Mandatory = $false)]
-    $InoteServerPort,
+    $InoteServerPort = 0,
     # The duration in minutes the IDERI note message should be valid for. (Default: 60)
     [Parameter(Mandatory = $false)]
     $InoteMsgDurationMinutes = "60",
