@@ -8,7 +8,7 @@
 ##
 ## Author: IDERI GmbH (Sebastian Mann)
 ## Homepage: https://www.ideri.com
-## Repo URL: https://github.com/ideri/IDERInote-checkMk_plugins
+## Repo URL: https://github.com/ideri/IDERInote
 ##
 ## History:
 ## (2022-10-27) 0.8: initial release
