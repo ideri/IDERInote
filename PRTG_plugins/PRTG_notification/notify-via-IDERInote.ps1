@@ -1,58 +1,58 @@
 param(
     # The IDERI note server name.
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $InoteServerName,
     # The TCP port for the IDERI note administrator interface. (Default: 1024)
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $InoteServerPort,
     # The duration in minutes the IDERI note message should be valid for. (Default: 60)
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $InoteMsgDurationMinutes = "60",
     # Show the IDERI note message in a popup. (Default: true)
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $InoteMsgShowPopup = $true,
     # Show the IDERI note message in a ticker. (Default: false)
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $InoteMsgShowTicker = $false,
     # The recipients for the IDERI note message as a comma separated string. (Example: 'note\homer.simpson, note\pc01$, note\GRP-IT')
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $InoteMsgRecipients,
     # The excludes for the IDERI note message as a comma separated string. (Example: 'note\homer.simpson, note\pc01$, note\GRP-IT')
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $InoteMsgExcludes,
     # Notify IDERI note server when message is received. (Default: false)
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $InoteMsgNotifyReceive = $false,
     # Notify IDERI note server when message is acknowledged. (Default: false)
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $InoteMsgNotifyAcknowledge = $false,
     # IDERI note message addressing mode. (Default: 'UserAndComputer'; Possible values: 'UserOnly', 'UserAndComputer', 'ComputerOnly')
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $InoteMsgAddressingMode = "UserAndComputer",
 
     # '%sensorid' placeholder data of PRTG
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $prtgSensorID,
     # '%device' placeholder data of PRTG
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $prtgDevice,
     # '%name' placeholder data of PRTG
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $prtgName,
     # '%laststatus' placeholder data of PRTG
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $prtgLastStatus,
     # '%down' placeholder data of PRTG
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $prtgDown,
     # '%message' placeholder data of PRTG
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $prtgMessage,
     # '%home' placeholder data of PRTG
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     $prtgHome,
     # '%sitename' placeholder data of PRTG
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $prtgSitename
 
 )
@@ -79,11 +79,11 @@ param(
 function New-InoteMessageWithDbForPrtg {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         $SensorID,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         $MessageObj,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         $dbPath = "$env:PROGRAMDATA\IDERI\note-PRTG-notification\sensorIdToMessageID.db.csv"
     )
     
@@ -94,8 +94,7 @@ function New-InoteMessageWithDbForPrtg {
         $msgID = $null
 
         # create path to db file if not existent
-        if(!(Test-Path $dbPath))
-        {
+        if (!(Test-Path $dbPath)) {
             New-Item -Path $([System.IO.Path]::GetDirectoryName($dbPath)) -ItemType Directory
         }
 
@@ -138,16 +137,16 @@ function New-InoteMessageWithDbForPrtg {
             
             #>
             
-            [cmdletbinding(SupportsShouldProcess=$True)]
+            [cmdletbinding(SupportsShouldProcess = $True)]
             
             Param (
-            [Parameter(Position=0,Mandatory=$True,HelpMessage="Enter a filename and path for the CSV file")]
-            [ValidateNotNullorEmpty()]
-            [string]$Path,
-            [Parameter(Position=1,Mandatory=$True,HelpMessage="Enter a hashtable",
-            ValueFromPipeline=$True)]
-            [ValidateNotNullorEmpty()]
-            [hashtable]$Hashtable
+                [Parameter(Position = 0, Mandatory = $True, HelpMessage = "Enter a filename and path for the CSV file")]
+                [ValidateNotNullorEmpty()]
+                [string]$Path,
+                [Parameter(Position = 1, Mandatory = $True, HelpMessage = "Enter a hashtable",
+                    ValueFromPipeline = $True)]
+                [ValidateNotNullorEmpty()]
+                [hashtable]$Hashtable
             
             )
             
@@ -163,8 +162,8 @@ function New-InoteMessageWithDbForPrtg {
                   hash table
                 #>
                 $Hashtable.GetEnumerator() | `
-                Select Key,Value,@{Name="Type";Expression={$_.value.gettype().name}} | `
-                Export-Csv -Path $Path
+                    Select Key, Value, @{Name = "Type"; Expression = { $_.value.gettype().name } } | `
+                    Export-Csv -Path $Path
             
             }
             
@@ -176,7 +175,7 @@ function New-InoteMessageWithDbForPrtg {
         
         Function Import-CSVtoHash {
         
-        <#
+            <#
         .Synopsis
         Import a CSV file and create a hash table
         .Description
@@ -216,20 +215,20 @@ function New-InoteMessageWithDbForPrtg {
         
         #>
         
-        [cmdletbinding()]
+            [cmdletbinding()]
         
-        Param (
-        [Parameter(Position=0,Mandatory=$True,HelpMessage="Enter a filename and path for the CSV file")]
-        [ValidateNotNullorEmpty()]
-        [ValidateScript({Test-Path -Path $_})]
-        [string]$Path
-        )
+            Param (
+                [Parameter(Position = 0, Mandatory = $True, HelpMessage = "Enter a filename and path for the CSV file")]
+                [ValidateNotNullorEmpty()]
+                [ValidateScript({ Test-Path -Path $_ })]
+                [string]$Path
+            )
         
-        Write-Verbose "Importing data from $Path"
+            Write-Verbose "Importing data from $Path"
         
-        Import-Csv -Path $path | ForEach-Object -begin {
+            Import-Csv -Path $path | ForEach-Object -begin {
                 #define an empty hash table
-                $hash=@{}
+                $hash = @{}
             } -process {
                 <#
                 if there is a type column, then add the entry as that type
@@ -237,30 +236,29 @@ function New-InoteMessageWithDbForPrtg {
                 #>
                 if ($_.Type) {
                     
-                    $type=[type]"$($_.type)"
+                    $type = [type]"$($_.type)"
                 }
                 else {
-                    $type=[type]"string"
+                    $type = [type]"string"
                 }
                 Write-Verbose "Adding $($_.key)"
                 Write-Verbose "Setting type to $type"
                 
-                $hash.Add($_.Key,($($_.Value) -as $type))
+                $hash.Add($_.Key, ($($_.Value) -as $type))
         
             } -end {
                 #write hash to the pipeline
                 Write-Output $hash
             }
         
-        write-verbose "Import complete"
+            write-verbose "Import complete"
         
         } #end function
     }
     
     process {
         # Then we import an existing db.csv if it exists
-        if(Test-Path($dbPath))
-        {
+        if (Test-Path($dbPath)) {
             # Import sensor IDs
             $sensorIDs = Import-CSVtoHash -Path "$dbPath"
             
@@ -269,13 +267,11 @@ function New-InoteMessageWithDbForPrtg {
         }
 
         # If msgID is other then 0 we update the message. Else we create a new one
-        if($msgID)
-        {
+        if ($msgID) {
             # Update an existing message
             $msgCreated = Set-iNoteMessage -MessageObject $MessageObj -Index $msgID -Force -ErrorAction Stop
             # error handling
-            if(!$msgCreated)
-            {
+            if (!$msgCreated) {
                 Write-Error "Message could not be created."
                 exit 1    
             }
@@ -285,8 +281,7 @@ function New-InoteMessageWithDbForPrtg {
             $msgCreated = New-iNoteMessage -MessageObject $MessageObj -Force -ErrorAction Stop
 
             # error handling
-            if(!$msgCreated)
-            {
+            if (!$msgCreated) {
                 Write-Error "Message could not be created."
                 exit 1    
             }
@@ -307,21 +302,17 @@ function New-InoteMessageWithDbForPrtg {
 }
 
 
-function Test-Prerequesites
-{
-    if((Get-Module -Name IDERI.note -ListAvailable) -eq $null)
-    {
+function Test-Prerequesites {
+    if ($null -eq (Get-Module -Name IDERI.note -ListAvailable)) {
         Write-Error "IDERI note PowerShell Module missing. Please install first."
         exit 1
     }
 }
 
 
-function Get-InotePriorityFromPrtgStatus($status)
-{
+function Get-InotePriorityFromPrtgStatus($status) {
     $statusArr = $status.Split(" ")
-    switch ($statusArr[0]) 
-    {
+    switch ($statusArr[0]) {
         "Down" { return "ALERT"; break; }
         "Warning" { return "WARNING"; break; }
         "Unusual" { return "WARNING"; break; }
@@ -332,15 +323,13 @@ function Get-InotePriorityFromPrtgStatus($status)
     }
 }
 
-function Add-InoteMsgRecipients([Ideri.Note.Message]$message, [string]$recipients)
-{
+function Add-InoteMsgRecipients([Ideri.Note.Message]$message, [string]$recipients) {
     $recipientsArr = $recipients.Split(",").Trim()
     $message.Recipient.Clear()
     $message.Recipient.AddRange($recipientsArr)
     return $message
 }
-function Add-InoteMsgExcludes([Ideri.Note.Message]$message, [string]$excludes)
-{
+function Add-InoteMsgExcludes([Ideri.Note.Message]$message, [string]$excludes) {
     $excludesArr = $excludes.Split(",").Trim()
     $message.Exclude.Clear()
     $message.Exclude.AddRange($excludesArr)
@@ -366,18 +355,16 @@ $msgText = "[$prtgSitename]" + [System.Environment]::NewLine + [System.Environme
     "$prtgMessage"
 
 # create a server connection to the IDERI note server
-try{
+try {
     New-iNoteServerConnection -ComputerName "$InoteServerName" -TCPPort ([int]::Parse($InoteServerPort)) -ErrorAction Stop
 }
-catch
-{
+catch {
     Write-Error "Failed to create a connection to the IDERI note server. $_"
     exit 1
 }
 
 # create an IDERI note message object
-try
-{
+try {
     $message = [Ideri.Note.Message]::new($IDERInoteServerSession)
     $message.Text = $msgText
     $message.Priority = [Ideri.Note.Priority]$priority
@@ -388,18 +375,15 @@ try
     $message.NotifyReceive = [System.Convert]::ToBoolean($InoteMsgNotifyReceive)
     $message.NotifyAcknowledge = [System.Convert]::ToBoolean($InoteMsgNotifyAcknowledge)
 }
-catch
-{
+catch {
     Write-Error "Failed to create message object. $_"
     exit 1
 }
 
-try
-{
+try {
     $message.AddressingMode = [Ideri.Note.AddressingMode]$InoteMsgAddressingMode
 }
-catch
-{
+catch {
     Write-Error "Failed to parse AddressingMode. $_"
 }
 
@@ -408,21 +392,18 @@ $message = Add-InoteMsgRecipients -message $message -recipients $InoteMsgRecipie
 $message = Add-InoteMsgExcludes -message $message -excludes $InoteMsgExcludes
 
 # add a link to the sensor
-if($prtgHome)
-{
+if ($prtgHome) {
     $parts = "$prtgHome", "sensor.htm?id=$prtgSensorID"
-    $urlToSensor = ($parts | foreach {$_.trim('/')}) -join '/'
+    $urlToSensor = ($parts | foreach { $_.trim('/') }) -join '/'
     $message.LinkText = "Go to sensor..."
     $message.LinkTarget = "$urlToSensor"
 }
 
 # create a new IDERI note message or update an existing one on the IDERI note server
-try
-{
+try {
     New-InoteMessageWithDbForPrtg -SensorID $prtgSensorID -MessageObj $message
 }
-catch
-{
+catch {
     Write-Error "Failed to create the message. $_"
     exit 1
 }
