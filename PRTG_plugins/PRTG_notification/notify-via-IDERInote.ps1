@@ -72,6 +72,9 @@ Note: This script includes some functions written by Jeffery Hicks.
       https://jdhitsolutions.com/blog/powershell/2062/export-and-import-hash-tables/
 
 History:
+(2022-11) 1.2:  Tested with PRTG version 21.4.72.1649+
+                - If the message to update cannot be accessed on the server, because of permissions or is deleted on the server, 
+                  the script now tries to create a new message instead and update the sensorID DB.
 (2022-11) 1.1:  Tested with PRTG version 21.4.72.1649+
                 - Optional logging added.
                 - Fix issue when optional parameter "InoteMsgExcludes" is missing.
