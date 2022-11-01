@@ -114,7 +114,7 @@ If you have problems creating messages with the script via PRTG, you should firs
     info on why the script might fail, you can enable logging in the script itself. Go to the script
     and look for the following section:
 
-```PS
+```powershell
 #######################################################################
 # GLOBAL VARIABLES
 ##################
