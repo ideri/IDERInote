@@ -63,7 +63,7 @@ By default the file holding the assignments between PRTG sensor IDs and IDERI no
     script to the right directory.
 - In the *Parameters* field add the following parameters:<br/>
     ```
-    -InoteServerName '<IDERInoteServer>' -InoteMsgRecipients '<domain>\<user>, <domain>\<group>, <domain>\<computer>$' -prtgSensorID '%sensorid' -prtgDevice '%device' -prtgName '%name' -prtgLastStatus '%laststatus' -prtgDown '%down' -prtgMessage '%message' -prtgSitename '%sitename'
+    -InoteServerName '<IDERInoteServer>' -InoteMsgRecipients '<domain>\<user>, <domain>\<group>, <domain>\<computer>$' -prtgSensorID '%sensorid' -prtgDevice '%device' -prtgName '%name' -prtgLastStatus '%laststatus' -prtgDown '%down' -prtgSitename '%sitename'
     ```
     These are a set of the mandatory parameters you have to specify. Please replace the values inside the "< ... >" 
     with the values of your environment.
@@ -100,7 +100,7 @@ By default the file holding the assignments between PRTG sensor IDs and IDERI no
 | prtgName                  | true      | Must be '%name'.                                                                                                                                               |
 | prtgLastStatus            | true      | Must be '%laststatus'.                                                                                                                                         |
 | prtgDown                  | true      | Must be '%down'.                                                                                                                                               |
-| prtgMessage               | true      | Must be '%message'.                                                                                                                                            |
+| prtgMessage               | false     | Must be '%message' if specified. Note: There is an issue with messages containing (double-) quotes breaking the script!                                        |
 | prtgSitename              | true      | Must be '%sitename'.                                                                                                                                           |
 | prtgHome                  | false     | Must be '%home'. If specified, the IDERI note message has a link to the sensor included.                                                                       |
 
