@@ -104,5 +104,50 @@ By default the file holding the assignments between PRTG sensor IDs and IDERI no
 | prtgSitename              | true      | Must be '%sitename'.                                                                                                                                           |
 | prtgHome                  | false     | Must be '%home'. If specified, the IDERI note message has a link to the sensor included.                                                                       |
 
+
+
 ## Troubleshooting
-__...TODO__: 
+
+### Enable log file
+If you have problems creating messages with the script via PRTG, you should first check the PRTG log
+    entries and see if you can find anything there relating the notification. But if you need more
+    info on why the script might fail, you can enable logging in the script itself. Go to the script
+    and look for the following section:
+
+```PS
+#######################################################################
+# GLOBAL VARIABLES
+##################
+# Variables for logging. If not set no log will be written. Remove the "#" in front of $Global:LogFilePath to create a log file.
+$Global:LoggingLevel = [int][LoggingLevel]::Error
+#$Global:LogFilePath = "$env:PROGRAMDATA/IDERI/note-PRTG-notification/notifications.log"
+```
+
+To start writing a log file from the script remove the "#" in front of the variable
+    *$Global:LogFilePath* and customize the path to your needs. Make sure the user executing the
+    script has write access on the directory you specify. If you save the script now, the next time
+    it gets executed a log file containing information about errors of the script will be written.
+
+You can increase the amount of data written to the log file by changing the logging level via the
+    global variable *$Global:LoggingLevel*. Possible logging levels are:
+
+| LogLevel    | value | Description                                                    |
+|-------------|-------|----------------------------------------------------------------|
+| Error       | 4     | Write only Errors to the log file.                             |
+| Warning     | 3     | Write Errors and Warnings to the log file.                     |
+| Information | 2     | Write Errors, Warnings and Informations to the log file.       |
+| Debug       | 1     | All of the above and Debug messages to the log file.           |
+| Trace       | 0     | Most detailed mode for writing extensive data to the log file. |
+
+> **Warning:** 
+> If a logging level other than __Error__ is specified, the size of the log file can
+> quickly become very large depending on the amount of notifications you send via the script. Make
+> sure to disable the logging again by commenting out the LogFilePath variable or set the
+> LoggingLevel back to __Error__ after troubleshooting.
+
+If a log file has been written successfully, if will contain messages in the following format:
+
+```
+<datetime> - <PowerShell Host InstanceID> - <PRTG Sensor ID> - <Message Severity> - <Log Message>
+```
+![PRTG_script_logentries](docs/images/prtg_script_logentries-png)

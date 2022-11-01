@@ -446,9 +446,9 @@ function Add-InoteMsgExcludes([Ideri.Note.Message]$message, [string]$excludes) {
 #######################################################################
 # GLOBAL VARIABLES
 ##################
-# Variables for logging. If not set no log will be written. Remove the "#"" for the LogFilePath variable value to write a log to that file.
+# Variables for logging. If not set no log will be written. Remove the "#" in front of $Global:LogFilePath to create a log file.
 $Global:LoggingLevel = [int][LoggingLevel]::Error
-$Global:LogFilePath = "$env:PROGRAMDATA/IDERI/note-PRTG-notification/notifications.log"
+#$Global:LogFilePath = "$env:PROGRAMDATA/IDERI/note-PRTG-notification/notifications.log"
 
 
 #######################################################################
