@@ -352,12 +352,12 @@ function New-InoteMessageWithDbForPrtg {
             # Check if current sensor ID exists in the DB and get the corresponding message ID.
             Write-Log "Checking if current sensor was already in db and set message index accordingly..." Debug
             $msgID = $sensorIDs["$sensorID"]
-            Write-Log "SensorID found in db." Debug
-            Write-Log "Message index: $msgID" Trace
         }
 
         # If msgID is other then null we update the message. Else we create a new one
         if ($msgID) {
+            Write-Log "SensorID found in db." Debug
+            Write-Log "Message index: $msgID" Trace
             # Update an existing message
             Write-Log "Trying to update the existing IDERI note message on the server..." Debug
             try{
@@ -365,13 +365,12 @@ function New-InoteMessageWithDbForPrtg {
                 Write-Log "IDERI note message updated successfully."
             }catch{
                 $err = "Message could not be updated. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-
                 Write-Log $err Error
-                Write-Error $err
-                exit 1
+                throw $_
             }
         }
         else {
+            Write-Log "SensorID could not be found in db." Debug
             # Create new message and get the ID
             Write-Log "Trying to create a new IDERI note message on the server..." Debug
             try{
@@ -379,10 +378,8 @@ function New-InoteMessageWithDbForPrtg {
                 Write-Log "IDERI note message created successfully."
             }catch{
                 $err = "Message could not be created. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-
                 Write-Log $err Error
-                Write-Error $err
-                exit 1
+                throw $_
             }
 
             # Now we got the new ID of the IDERI note message associated with the sensor and can add it to the DB.
@@ -457,7 +454,7 @@ $Global:LogFilePath = "$env:PROGRAMDATA/IDERI/note-PRTG-notification/notificatio
 #######################################################################
 # SCRIPT
 ########
-
+Write-Log "##############################################"
 Write-Log "Script started."
 
 # For debug purposes write the parameters passed to the script to the log file
@@ -478,21 +475,20 @@ Write-Log "---- END TRACE ----" Trace
 Write-Log "Testing prerequesites..." Information
 Test-Prerequesites
 
-# parse laststatus to priority
-Write-Log "Parsing status to message priority..."
 try{
-    $priority = Get-InotePriorityFromPrtgStatus($prtgLastStatus)
-    Write-Log "Priority of message set to: $priority" Debug
-}catch{
-    $err = "Could not parse state to priority. Continue anyway with default priority. Err: (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
+    # parse laststatus to priority
+    Write-Log "Parsing status to message priority..."
+    try{
+        $priority = Get-InotePriorityFromPrtgStatus($prtgLastStatus)
+        Write-Log "Priority of message set to: $priority" Debug
+    }catch{
+        $err = "Could not parse state to priority. Continue anyway with default priority. Err: (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
+        Write-Log $err Warning
+    }
 
-    Write-Log $err Warning
-    Write-Error $err
-}
-
-# compose the message text
-Write-Log "Composing the message text..."
-$msgText = @"
+    # compose the message text
+    Write-Log "Composing the message text..."
+    $msgText = @"
 [$prtgSitename]
 
 Sensor '$prtgName' of '$prtgDevice' has state '$prtgLastStatus'.
@@ -503,100 +499,94 @@ Status: $prtgLastStatus
 Down: $prtgDown
 "@
 
-# Add PRTG message if specified
-if($prtgMessage){
-    Write-Log "Adding PRTG message to message text..." Debug
-    $msgText += [System.Environment]::NewLine + [System.Environment]::NewLine + "Message Text:" + [System.Environment]::NewLine + $prtgMessage
+    # Add PRTG message if specified
+    if($prtgMessage){
+        Write-Log "Adding PRTG message to message text..." Debug
+        $msgText += [System.Environment]::NewLine + [System.Environment]::NewLine + "Message Text:" + [System.Environment]::NewLine + $prtgMessage
+    }
+
+
+    Write-Log "Message text: $msgText" Trace
+
+    # create a server connection to the IDERI note server
+    Write-Log "Creating a connection to the IDERI note server..."
+    try {
+        Write-Log "Server: $InoteServerName" Trace
+        Write-Log "Port: $InoteServerPort" Trace
+        New-iNoteServerConnection -ComputerName "$InoteServerName" -TCPPort ([int]::Parse($InoteServerPort)) -ErrorAction Stop
+        Write-Log "Connection to the IDERI note Server was successfull."
+    }
+    catch {
+        $err = "Failed to create a connection to the IDERI note server. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
+        Write-Log "$err" Error
+        throw $_
+    }
+
+    # create an IDERI note message object
+    Write-Log "Creating a new IDERI note message object..."
+    try {
+        $message = [Ideri.Note.Message]::new($IDERInoteServerSession)
+        $message.Text = $msgText
+        $message.Priority = [Ideri.Note.Priority]$priority
+        $message.StartTime = (Get-Date)
+        $message.EndTime = (Get-Date).AddMinutes([int]::Parse($InoteMsgDurationMinutes))
+        $message.ShowPopup = [System.Convert]::ToBoolean($InoteMsgShowPopup)
+        $message.ShowTicker = [System.Convert]::ToBoolean($InoteMsgShowTicker)
+        $message.NotifyReceive = [System.Convert]::ToBoolean($InoteMsgNotifyReceive)
+        $message.NotifyAcknowledge = [System.Convert]::ToBoolean($InoteMsgNotifyAcknowledge)
+
+        Write-Log "Message object created successfully." Debug
+    }
+    catch {
+        $err = "Failed to create message object. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
+        Write-Log $err Error
+        throw $_
+    }
+
+    # set the addressing mode for the message
+    Write-Log "Trying to set the addressing mode for the message..."
+    try {
+        $message.AddressingMode = [Ideri.Note.AddressingMode]$InoteMsgAddressingMode
+        Write-Log "Addressing mode set successfully." Debug
+    }
+    catch {
+        $err = "Failed to parse AddressingMode. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
+        Write-Log $err Error
+        throw $_
+    }
+
+    # add recipients
+    Write-Log "Parsing and adding recipients to message..."
+    try{
+        $message = Add-InoteMsgRecipients -message $message -recipients $InoteMsgRecipients
+        Write-Log "Recipients: $($message.Recipient -join ', ')" Trace
+    }catch{
+        Write-Log "Failed to parse recipients. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_"  Error
+        throw $_
+    }
+    # add excludes to message
+    Write-Log "Parsing and adding excludes to message..."
+    try{
+        $message = Add-InoteMsgExcludes -message $message -excludes $InoteMsgExcludes
+        Write-Log "Excludes: $($message.Recipient -join ', ')" Trace
+    }catch{
+        Write-Log "Failed to parse excludes. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_"  Error
+        throw $_
+    }
+
+    # add a link to the sensor
+    if ($prtgHome) {
+        Write-Log "Adding a link to the sensor to the message..."
+        $parts = "$prtgHome", "sensor.htm?id=$prtgSensorID"
+        $urlToSensor = ($parts | foreach { $_.trim('/') }) -join '/'
+        $message.LinkText = "Go to sensor..."
+        $message.LinkTarget = "$urlToSensor"
+    }
 }
-
-
-Write-Log "Message text: $msgText" Trace
-
-# create a server connection to the IDERI note server
-Write-Log "Creating a connection to the IDERI note server..."
-try {
-    Write-Log "Server: $InoteServerName" Trace
-    Write-Log "Port: $InoteServerPort" Trace
-    New-iNoteServerConnection -ComputerName "$InoteServerName" -TCPPort ([int]::Parse($InoteServerPort)) -ErrorAction Stop
-    Write-Log "Connection to the IDERI note Server was successfull."
-}
-catch {
-    $err = "Failed to create a connection to the IDERI note server. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-
-    Write-Log "$err" Error
-    Write-Error "$err"
+catch{
+    Write-Log "$($_.Exception.ToString())" Debug
+    $err = "An error occured while composing the message object. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
     exit 1
-}
-
-# create an IDERI note message object
-Write-Log "Creating a new IDERI note message object..."
-try {
-    $message = [Ideri.Note.Message]::new($IDERInoteServerSession)
-    $message.Text = $msgText
-    $message.Priority = [Ideri.Note.Priority]$priority
-    $message.StartTime = (Get-Date)
-    $message.EndTime = (Get-Date).AddMinutes([int]::Parse($InoteMsgDurationMinutes))
-    $message.ShowPopup = [System.Convert]::ToBoolean($InoteMsgShowPopup)
-    $message.ShowTicker = [System.Convert]::ToBoolean($InoteMsgShowTicker)
-    $message.NotifyReceive = [System.Convert]::ToBoolean($InoteMsgNotifyReceive)
-    $message.NotifyAcknowledge = [System.Convert]::ToBoolean($InoteMsgNotifyAcknowledge)
-
-    Write-Log "Message object created successfully." Debug
-}
-catch {
-    $err = "Failed to create message object. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-
-    Write-Log $err Error
-    Write-Error $err
-    exit 1
-}
-
-# set the addressing mode for the message
-Write-Log "Trying to set the addressing mode for the message..."
-try {
-    $message.AddressingMode = [Ideri.Note.AddressingMode]$InoteMsgAddressingMode
-    Write-Log "Addressing mode set successfully." Debug
-}
-catch {
-    $err = "Failed to parse AddressingMode. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-
-    Write-Log $err Error
-    Write-Error $err
-    exit 1
-}
-
-# add recipients
-Write-Log "Parsing and adding recipients to message..."
-try{
-    $message = Add-InoteMsgRecipients -message $message -recipients $InoteMsgRecipients
-    Write-Log "Recipients: $($message.Recipient -join ', ')" Trace
-}catch{
-    $err = "Failed to parse recipients. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-
-    Write-Log $err Error
-    Write-Error $err
-    exit 1
-}
-# add excludes to message
-Write-Log "Parsing and adding excludes to message..."
-try{
-    $message = Add-InoteMsgExcludes -message $message -excludes $InoteMsgExcludes
-    Write-Log "Excludes: $($message.Recipient -join ', ')" Trace
-}catch{
-    $err = "Failed to parse excludes. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-
-    Write-Log $err Error
-    Write-Error $err
-    exit 1
-}
-
-# add a link to the sensor
-if ($prtgHome) {
-    Write-Log "Adding a link to the sensor to the message..."
-    $parts = "$prtgHome", "sensor.htm?id=$prtgSensorID"
-    $urlToSensor = ($parts | foreach { $_.trim('/') }) -join '/'
-    $message.LinkText = "Go to sensor..."
-    $message.LinkTarget = "$urlToSensor"
 }
 
 # create a new IDERI note message or update an existing one on the IDERI note server
@@ -606,8 +596,8 @@ try {
 }
 catch {
     $err = "An error occured while creating message. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-
     Write-Log $err Error
+    Write-Log "$($_.Exception.ToString())" Debug
     Write-Error $err
     exit 1
 }
