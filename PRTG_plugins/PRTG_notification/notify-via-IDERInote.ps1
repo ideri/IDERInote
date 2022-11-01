@@ -92,7 +92,7 @@ enum LoggingLevel {
 }
 
 function Write-Log() {
-<#
+    <#
 .SYNOPSIS
 Writes a log file.
 
@@ -153,7 +153,7 @@ Regires the global variables 'LoggingLevel' and 'LogFilePath' to be set.
                     $([int][LoggingLevel]::Information) { Write-ToLog -severity "I"; break; }
                     $([int][LoggingLevel]::Debug) { Write-ToLog -severity "D"; break; }
                     $([int][LoggingLevel]::Trace) { Write-ToLog -severity "T"; break; }
-                    Default { Write-ToLog -severity "0"; break;}
+                    Default { Write-ToLog -severity "0"; break; }
                 }
             }
         }
@@ -338,6 +338,25 @@ function New-InoteMessageWithDbForPrtg {
             write-verbose "Import complete"
         
         } #end function
+
+        Function New-InoteMessageAndReturnMsgIndex {
+            param(
+                $MsgObj
+            )
+
+            Write-Log "Trying to create a new IDERI note message on the server..." Debug
+            try {
+                $msgCreated = New-iNoteMessage -MessageObject $MsgObj -Force -ErrorAction Stop
+                Write-Log "IDERI note message created successfully."
+            }
+            catch {
+                $err = "Message could not be created. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
+                Write-Log $err Error
+                throw $_
+            }
+
+            return $msgCreated.Index
+        }
     }
     
     process {
@@ -360,32 +379,48 @@ function New-InoteMessageWithDbForPrtg {
             Write-Log "Message index: $msgID" Trace
             # Update an existing message
             Write-Log "Trying to update the existing IDERI note message on the server..." Debug
-            try{
+            try {
                 $msgCreated = Set-iNoteMessage -MessageObject $MessageObj -Index $msgID -Force -ErrorAction Stop
                 Write-Log "IDERI note message updated successfully."
-            }catch{
-                $err = "Message could not be updated. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-                Write-Log $err Error
-                throw $_
+            }
+            catch {
+                # Check if error arose because of deleted message on the server or an access denied. If so, try to create a new message and update the DB.
+                if ($_.Exception.GetType() -eq [System.NullReferenceException] -or 
+                  ($_.Exception.GetType() -eq [System.ComponentModel.Win32Exception] -and $_.Exception.NativeErrorCode -eq 5)) {
+                    # Compose the error text
+                    if($_.Exception.GetType() -eq [System.NullReferenceException]){
+                        $err = "Message with index $msgID seems to be deleted on the server. Trying to create a new one..."
+                    }
+                    elseif($_.Exception.GetType() -eq [System.ComponentModel.Win32Exception] -and $_.Exception.NativeErrorCode -eq 5){
+                        $err = "Message with index $msgID cannot be updated on the server due to invalid permissions. Trying to create a new one..."
+                    }
+                    Write-Log $err Error
+    
+                    $newMsgID = New-InoteMessageAndReturnMsgIndex -MsgObj $MessageObj
+    
+                    Write-Log "Updating message ID value for sensor in db..." Debug
+                    Write-Log "Old value: $msgID" Trace
+                    Write-Log "New value: $newMsgID" Trace
+                    $sensorIDs["$sensorID"] = $newMsgID
+    
+                    # Finally we export the hash to db.csv, as we've updated a value
+                    Write-Log "Overwriting the db file..." Debug
+                    Export-HashtoCSV -Path "$dbPath" -Hashtable $sensorIDs
+                }
+                else {
+                    $err = "Message could not be updated. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
+                    Write-Log $err Error
+                    throw $_
+                }
             }
         }
         else {
             Write-Log "SensorID could not be found in db." Debug
             # Create new message and get the ID
-            Write-Log "Trying to create a new IDERI note message on the server..." Debug
-            try{
-                $msgCreated = New-iNoteMessage -MessageObject $MessageObj -Force -ErrorAction Stop
-                Write-Log "IDERI note message created successfully."
-            }catch{
-                $err = "Message could not be created. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
-                Write-Log $err Error
-                throw $_
-            }
+            $msgID = New-InoteMessageAndReturnMsgIndex -MsgObj $MessageObj
 
             # Now we got the new ID of the IDERI note message associated with the sensor and can add it to the DB.
             Write-Log "Adding the new message index for the sensorID to the db..." Debug
-            $msgID = $msgCreated.Index
-
             $sensorIDs.Add("$sensorID", $msgID)
 
             # Finally we export the hash to db.csv, as we've added a value
@@ -424,10 +459,10 @@ function Get-InotePriorityFromPrtgStatus($status) {
 }
 
 function Add-InoteMsgRecipients([Ideri.Note.Message]$message, [string]$recipients) {
-    if([string]::IsNullOrEmpty($recipients)){
+    if ([string]::IsNullOrEmpty($recipients)) {
         Write-Error "No recipients defined." -ErrorAction Stop
     }
-    else{
+    else {
         $recipientsArr = $recipients.Split(",").Trim()
         $message.Recipient.Clear()
         $message.Recipient.AddRange($recipientsArr)
@@ -435,7 +470,7 @@ function Add-InoteMsgRecipients([Ideri.Note.Message]$message, [string]$recipient
     return $message    
 }
 function Add-InoteMsgExcludes([Ideri.Note.Message]$message, [string]$excludes) {
-    if(![String]::IsNullOrEmpty($excludes)){
+    if (![String]::IsNullOrEmpty($excludes)) {
         $excludesArr = $excludes.Split(",").Trim()
         $message.Exclude.Clear()
         $message.Exclude.AddRange($excludesArr)
@@ -460,8 +495,7 @@ Write-Log "Script started."
 # For debug purposes write the parameters passed to the script to the log file
 Write-Log "------ TRACE ------" Trace
 Write-Log "Parameters passed to script:" Trace
-foreach ($key in $MyInvocation.BoundParameters.keys)
-{
+foreach ($key in $MyInvocation.BoundParameters.keys) {
     $value = (get-variable $key).Value 
     Write-Log "$key : $value" Trace
 }
@@ -475,13 +509,14 @@ Write-Log "---- END TRACE ----" Trace
 Write-Log "Testing prerequesites..." Information
 Test-Prerequesites
 
-try{
+try {
     # parse laststatus to priority
     Write-Log "Parsing status to message priority..."
-    try{
+    try {
         $priority = Get-InotePriorityFromPrtgStatus($prtgLastStatus)
         Write-Log "Priority of message set to: $priority" Debug
-    }catch{
+    }
+    catch {
         $err = "Could not parse state to priority. Continue anyway with default priority. Err: (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
         Write-Log $err Warning
     }
@@ -500,7 +535,7 @@ Down: $prtgDown
 "@
 
     # Add PRTG message if specified
-    if($prtgMessage){
+    if ($prtgMessage) {
         Write-Log "Adding PRTG message to message text..." Debug
         $msgText += [System.Environment]::NewLine + [System.Environment]::NewLine + "Message Text:" + [System.Environment]::NewLine + $prtgMessage
     }
@@ -557,19 +592,21 @@ Down: $prtgDown
 
     # add recipients
     Write-Log "Parsing and adding recipients to message..."
-    try{
+    try {
         $message = Add-InoteMsgRecipients -message $message -recipients $InoteMsgRecipients
         Write-Log "Recipients: $($message.Recipient -join ', ')" Trace
-    }catch{
+    }
+    catch {
         Write-Log "Failed to parse recipients. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_"  Error
         throw $_
     }
     # add excludes to message
     Write-Log "Parsing and adding excludes to message..."
-    try{
+    try {
         $message = Add-InoteMsgExcludes -message $message -excludes $InoteMsgExcludes
         Write-Log "Excludes: $($message.Recipient -join ', ')" Trace
-    }catch{
+    }
+    catch {
         Write-Log "Failed to parse excludes. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_"  Error
         throw $_
     }
@@ -583,7 +620,7 @@ Down: $prtgDown
         $message.LinkTarget = "$urlToSensor"
     }
 }
-catch{
+catch {
     Write-Log "$($_.Exception.ToString())" Debug
     $err = "An error occured while composing the message object. (Line $($_.InvocationInfo.ScriptLineNumber)) - $_" 
     exit 1
@@ -602,3 +639,4 @@ catch {
     exit 1
 }
 
+Write-Log "Script done."
