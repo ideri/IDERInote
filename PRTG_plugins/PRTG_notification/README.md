@@ -79,7 +79,7 @@ By default the file holding the assignments between PRTG sensor IDs and IDERI no
     directory (__Important!__).
     ![PRTG_new_notification_template_exe](docs/images/prtg_notify_template_exe.png)
   
-- After you've configured the template to your needs click the *Create* button on the right hand side of the window.
+- After you have configured the template to your needs click the *Create* button on the right hand side of the window.
 
 ## Parameters available
 
