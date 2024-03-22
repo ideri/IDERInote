@@ -31,6 +31,7 @@ By default the file holding the assignments between PRTG sensor IDs and IDERI no
 
 ## Prerequesites
 - PRTG version: >=20.1.57
+- PowerShell in Version >= 5.0
 - IDERI note PowerShell Module installed on the PRTG server.
 - The user executing the script must have write access on directory __%PROGRAMDATA%\\IDERI\\note-PRTG-notification\\*__.
 
