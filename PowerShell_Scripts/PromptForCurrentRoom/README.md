@@ -2,6 +2,7 @@
 
 ## Description
 This script shows an UI that asks for the current location (room name/number) of the user. The given value will then be saved in an user environment variable. This variable again can be used, e.g. with the IDERI note Hotkey component.
+![PromptForRoom](docs/images/Prompt.png)
 
 ## Purpose
 ### Example
