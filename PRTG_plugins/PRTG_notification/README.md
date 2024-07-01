@@ -39,7 +39,7 @@ By default the file holding the assignments between PRTG sensor IDs and IDERI no
 - Install the IDERI note PowerShell Module from the latest inote.exe. (You can download it from the IDERI note homepage.)
 
 - Download the notification script "notify-via-IDERInote.ps1" from the repository. 
-    (https://github.com/ideri/IDERInote/blob/PRTG_plugins/PRTG_plugins/PRTG_notification/notify-via-IDERInote.ps1)
+    (https://github.com/ideri/IDERInote/blob/main/PRTG_plugins/PRTG_notification/notify-via-IDERInote.ps1)
 
 - Copy the script to your PRTG installations notification directory. <br/> (Default: 
     __*"C:\Program Files (x86)\PRTG Network Monitor\notifications\exe\notify-via-IDERInote.ps1"*__)
