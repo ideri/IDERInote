@@ -26,7 +26,7 @@ First, open the .ps1 file with an editor of your choice and change the values in
 | $INTQDADM_EXE_PATH            | "C:\Program Files (x86)\ideri\IDERI note Administrator\intqdadm.exe" | The path to the intqdadm.exe on your system.                                       |
 | $DEFAULT_TEMPLATE             | ""                                                                   | The name of the template that should be preselected when the UI initially shows.   |
 | $SRV_CONNECTION_INI_FILE_NAME | "_IDERInoteServerConnectionSection.ini"                              | The file name in the TEMPLATE_FOLDER that conains the default connection settings. |
-| $LANGUAGE                     | "en"                                                                 | The language of the UI. (possible values: en, de)                                  |
+| $LANGUAGE                     | "en"                                                                 | The language of the UI. (possible values: en, de, fr)                             |
 
 ## Creating templates
 By default the templates should be in a folder called *Templates* located next to the .ps1 script file.

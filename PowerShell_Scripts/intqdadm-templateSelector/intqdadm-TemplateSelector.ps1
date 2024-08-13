@@ -14,7 +14,7 @@ $INTQDADM_EXE_PATH = "C:\Program Files (x86)\ideri\IDERI note Administrator\intq
 $DEFAULT_TEMPLATE = ""
 # The file name in the TEMPLATE_FOLDER that conains the default connection settings
 $SRV_CONNECTION_INI_FILE_NAME = "_IDERInoteServerConnectionSection.ini"
-# The language of the UI (possible values: en, de)
+# The language of the UI (possible values: en, de, fr)
 $LANGUAGE = "en"
 
 
@@ -22,6 +22,7 @@ $LANGUAGE = "en"
 # Translations
 #######################################
 switch ($LANGUAGE) {
+    "fr" { $lang = @{window_heading='Modèles IDERI note'; btn_Select='Sélectionner'; lbl_TemplateSelection='Veuillez sélectionner un modèle:'}}
     "de" { $lang = @{window_heading='IDERI note Vorlagen'; btn_Select='Auswählen'; lbl_TemplateSelection='Bitte wählen Sie eine Vorlage aus:'}}
     Default { $lang = @{window_heading='IDERI note templates'; btn_Select='Select'; lbl_TemplateSelection='Please select a template:'}}
 }
