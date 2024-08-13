@@ -30,7 +30,10 @@ First, open the .ps1 file with an editor of your choice and change the values in
 
 ## Creating templates
 By default the templates should be in a folder called *Templates* located next to the .ps1 script file.
-Add as many .ini files as you like to this folder and set the ini sections and values accordingly. An example ini file can be found in the IDERI note online help in section  [intqdadm.exe command line parameters](https://docs.ideri.com/note/help/en/Appendix_B_-_Command_Line_Parameters/intqdadm.exe_command_line_parameters.html). You can also find some sample template ini files in the [*Templates* folder](Templates/) in this repository.
+Add as many .ini files as you like to this folder and set the ini sections and values accordingly. An example ini file can be found in the IDERI note online help in section  [intqdadm.exe command line parameters](https://docs.ideri.com/note/help/en/Appendix_B_-_Command_Line_Parameters/intqdadm.exe_command_line_parameters.html). You can also find some sample template ini files in the [*Templates* folder](Templates/) in this repository. 
+
+> **Note:**
+> Please make sure that you save the ini files with an **UTF8 encoding** so that umlauts and special chars are displayed correctly.
 
 Example template for a new message:
 ``` ini
