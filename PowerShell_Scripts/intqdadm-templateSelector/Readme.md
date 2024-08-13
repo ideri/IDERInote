@@ -30,7 +30,7 @@ First, open the .ps1 file with an editor of your choice and change the values in
 
 ## Creating templates
 By default the templates should be in a folder called *Templates* located next to the .ps1 script file.
-Add as many .ini files as you like to this folder and set the ini sections and values accordingly. An example ini file can be found in the IDERI note online help in section  [intqdadm.exe command line parameters](https://docs.ideri.com/note/help/en/Appendix_B_-_Command_Line_Parameters/intqdadm.exe_command_line_parameters.html).
+Add as many .ini files as you like to this folder and set the ini sections and values accordingly. An example ini file can be found in the IDERI note online help in section  [intqdadm.exe command line parameters](https://docs.ideri.com/note/help/en/Appendix_B_-_Command_Line_Parameters/intqdadm.exe_command_line_parameters.html). You can also find some sample template ini files in the [*Templates* folder](Templates/) in this repository.
 
 Example template for a new message:
 ``` ini
@@ -55,6 +55,7 @@ Folder with available templates:
 
 ## Server connection template
 In most cases, you will only use a single IDERI note server in your environment for message creation. Although each template can have its own independent connection section, a common connection template can also be used so that you do not have to maintain the connections for each template separately. The connection template file to be used can be defined via the script variable **$SERVER_CONNECTION_SEKTION_INI_FILE_NAME** and should only contain the **[Connection]** ini section with its values.
+You can find a [sample template ini file for the connection](Templates/_IDERInoteServerConnectionSection.ini) in the *Templates* folder in this repository.
 
 Example of the content of a connection template file:
 ``` ini
