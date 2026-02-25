@@ -19,13 +19,15 @@ Write-Host
 
 try{
     Import-Module IDERI.note -ErrorAction Stop
+    
+    [int]$licsInUse = 0
+    [int]$lastMaxLicsUsedValue = 0
 
     # get the current license info from the inote server
     $licInfos = Get-iNoteLicenseInformation
     $licsInUse = $licInfos.DesktopLicensesUsed
 
     # get the last max value from existing file
-    $lastMaxLicsUsedValue = 0
     if (Test-Path -Path "$OUT_FILE_MAX_LICS"){
         Write-Host "Reading previous max lics used value from file..."
         $lastMaxLicsUsedValue = (Import-Csv -Path "$OUT_FILE_MAX_LICS" -Delimiter ";").UsedLicenses
